@@ -1,4 +1,3 @@
-usingnamespace @import("std").c.builtins;
 pub const Vector2 = extern struct {
     x: f32,
     y: f32,
@@ -251,7 +250,7 @@ pub const VrStereoConfig = extern struct {
     scale: [2]f32,
     scaleIn: [2]f32,
 };
-pub const ConfigFlags = extern enum(c_int) {
+pub const ConfigFlags = enum(c_int) {
     VSYNC_HINT = 64,
     FULLSCREEN_MODE = 2,
     WINDOW_RESIZABLE = 4,
@@ -268,7 +267,7 @@ pub const ConfigFlags = extern enum(c_int) {
     INTERLACED_HINT = 65536,
     _,
 };
-pub const TraceLogLevel = extern enum(c_int) {
+pub const TraceLogLevel = enum(c_int) {
     ALL = 0,
     TRACE = 1,
     DEBUG = 2,
@@ -279,7 +278,7 @@ pub const TraceLogLevel = extern enum(c_int) {
     NONE = 7,
     _,
 };
-pub const KeyboardKey = extern enum(c_int) {
+pub const KeyboardKey = enum(c_int) {
     NULL = 0,
     APOSTROPHE = 39,
     COMMA = 44,
@@ -392,13 +391,13 @@ pub const KeyboardKey = extern enum(c_int) {
     VOLUME_DOWN = 25,
     _,
 };
-pub const MouseButton = extern enum(c_int) {
+pub const MouseButton = enum(c_int) {
     LEFT = 0,
     RIGHT = 1,
     MIDDLE = 2,
     _,
 };
-pub const MouseCursor = extern enum(c_int) {
+pub const MouseCursor = enum(c_int) {
     DEFAULT = 0,
     ARROW = 1,
     IBEAM = 2,
@@ -412,7 +411,7 @@ pub const MouseCursor = extern enum(c_int) {
     NOT_ALLOWED = 10,
     _,
 };
-pub const GamepadButton = extern enum(c_int) {
+pub const GamepadButton = enum(c_int) {
     UNKNOWN = 0,
     LEFT_FACE_UP = 1,
     LEFT_FACE_RIGHT = 2,
@@ -433,7 +432,7 @@ pub const GamepadButton = extern enum(c_int) {
     RIGHT_THUMB = 17,
     _,
 };
-pub const GamepadAxis = extern enum(c_int) {
+pub const GamepadAxis = enum(c_int) {
     LEFT_X = 0,
     LEFT_Y = 1,
     RIGHT_X = 2,
@@ -442,7 +441,7 @@ pub const GamepadAxis = extern enum(c_int) {
     RIGHT_TRIGGER = 5,
     _,
 };
-pub const MaterialMapIndex = extern enum(c_int) {
+pub const MaterialMapIndex = enum(c_int) {
     ALBEDO = 0,
     METALNESS = 1,
     NORMAL = 2,
@@ -456,7 +455,7 @@ pub const MaterialMapIndex = extern enum(c_int) {
     PREFILTER = 10,
     _,
 };
-pub const ShaderLocationIndex = extern enum(c_int) {
+pub const ShaderLocationIndex = enum(c_int) {
     VERTEX_POSITION = 0,
     VERTEX_TEXCOORD01 = 1,
     VERTEX_TEXCOORD02 = 2,
@@ -485,7 +484,7 @@ pub const ShaderLocationIndex = extern enum(c_int) {
     MAP_BRDF = 25,
     _,
 };
-pub const ShaderUniformDataType = extern enum(c_int) {
+pub const ShaderUniformDataType = enum(c_int) {
     FLOAT = 0,
     VEC2 = 1,
     VEC3 = 2,
@@ -497,7 +496,7 @@ pub const ShaderUniformDataType = extern enum(c_int) {
     SAMPLER2D = 8,
     _,
 };
-pub const PixelFormat = extern enum(c_int) {
+pub const PixelFormat = enum(c_int) {
     UNCOMPRESSED_GRAYSCALE = 1,
     UNCOMPRESSED_GRAY_ALPHA = 2,
     UNCOMPRESSED_R5G6B5 = 3,
@@ -521,7 +520,7 @@ pub const PixelFormat = extern enum(c_int) {
     COMPRESSED_ASTC_8x8_RGBA = 21,
     _,
 };
-pub const TextureFilter = extern enum(c_int) {
+pub const TextureFilter = enum(c_int) {
     POINT = 0,
     BILINEAR = 1,
     TRILINEAR = 2,
@@ -530,14 +529,14 @@ pub const TextureFilter = extern enum(c_int) {
     ANISOTROPIC_16X = 5,
     _,
 };
-pub const TextureWrap = extern enum(c_int) {
+pub const TextureWrap = enum(c_int) {
     REPEAT = 0,
     CLAMP = 1,
     MIRROR_REPEAT = 2,
     MIRROR_CLAMP = 3,
     _,
 };
-pub const CubemapLayout = extern enum(c_int) {
+pub const CubemapLayout = enum(c_int) {
     AUTO_DETECT = 0,
     LINE_VERTICAL = 1,
     LINE_HORIZONTAL = 2,
@@ -546,13 +545,13 @@ pub const CubemapLayout = extern enum(c_int) {
     PANORAMA = 5,
     _,
 };
-pub const FontType = extern enum(c_int) {
+pub const FontType = enum(c_int) {
     DEFAULT = 0,
     BITMAP = 1,
     SDF = 2,
     _,
 };
-pub const BlendMode = extern enum(c_int) {
+pub const BlendMode = enum(c_int) {
     ALPHA = 0,
     ADDITIVE = 1,
     MULTIPLIED = 2,
@@ -561,7 +560,7 @@ pub const BlendMode = extern enum(c_int) {
     CUSTOM = 5,
     _,
 };
-pub const Gestures = extern enum(c_int) {
+pub const Gestures = enum(c_int) {
     NONE = 0,
     TAP = 1,
     DOUBLETAP = 2,
@@ -575,7 +574,7 @@ pub const Gestures = extern enum(c_int) {
     PINCH_OUT = 512,
     _,
 };
-pub const CameraMode = extern enum(c_int) {
+pub const CameraMode = enum(c_int) {
     CUSTOM = 0,
     FREE = 1,
     ORBITAL = 2,
@@ -583,12 +582,12 @@ pub const CameraMode = extern enum(c_int) {
     THIRD_PERSON = 4,
     _,
 };
-pub const CameraProjection = extern enum(c_int) {
+pub const CameraProjection = enum(c_int) {
     PERSPECTIVE = 0,
     ORTHOGRAPHIC = 1,
     _,
 };
-pub const NPatchLayout = extern enum(c_int) {
+pub const NPatchLayout = enum(c_int) {
     NINE_PATCH = 0,
     THREE_PATCH_VERTICAL = 1,
     THREE_PATCH_HORIZONTAL = 2,
