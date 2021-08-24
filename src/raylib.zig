@@ -78,14 +78,14 @@ pub const Image = extern struct {
     width: c_int,
     height: c_int,
     mipmaps: c_int,
-    format: c_int,
+    format: PixelFormat,
 };
 pub const Texture = extern struct {
     id: c_uint,
     width: c_int,
     height: c_int,
     mipmaps: c_int,
-    format: c_int,
+    format: PixelFormat,
 };
 pub const Texture2D = Texture;
 pub const TextureCubemap = Texture;
@@ -101,7 +101,7 @@ pub const NPatchInfo = extern struct {
     top: c_int,
     right: c_int,
     bottom: c_int,
-    layout: c_int,
+    layout: NPatchLayout,
 };
 pub const CharInfo = extern struct {
     value: c_int,
@@ -123,7 +123,7 @@ pub const Camera3D = extern struct {
     target: Vector3,
     up: Vector3,
     fovy: f32,
-    projection: c_int,
+    projection: CameraProjection,
 };
 pub const Camera = Camera3D;
 pub const Camera2D = extern struct {
@@ -454,6 +454,9 @@ pub const MaterialMapIndex = enum(c_int) {
     IRRADIANCE = 9,
     PREFILTER = 10,
     _,
+
+    pub const DIFFUSE = @This().ALBEDO;
+    pub const SPECULAR = @This().METALNESS;
 };
 pub const ShaderLocationIndex = enum(c_int) {
     VERTEX_POSITION = 0,
@@ -483,6 +486,9 @@ pub const ShaderLocationIndex = enum(c_int) {
     MAP_PREFILTER = 24,
     MAP_BRDF = 25,
     _,
+
+    pub const DIFFUSE = @This().ALBEDO;
+    pub const SPECULAR = @This().METALNESS;
 };
 pub const ShaderUniformDataType = enum(c_int) {
     FLOAT = 0,
@@ -655,7 +661,7 @@ pub extern fn BeginTextureMode(target: RenderTexture2D) void;
 pub extern fn EndTextureMode() void;
 pub extern fn BeginShaderMode(shader: Shader) void;
 pub extern fn EndShaderMode() void;
-pub extern fn BeginBlendMode(mode: c_int) void;
+pub extern fn BeginBlendMode(mode: BlendMode) void;
 pub extern fn EndBlendMode() void;
 pub extern fn BeginScissorMode(x: c_int, y: c_int, width: c_int, height: c_int) void;
 pub extern fn EndScissorMode() void;
@@ -665,12 +671,12 @@ pub extern fn LoadVrStereoConfig(device: VrDeviceInfo) VrStereoConfig;
 pub extern fn UnloadVrStereoConfig(config: VrStereoConfig) void;
 pub extern fn LoadShader(vsFileName: [*c]const u8, fsFileName: [*c]const u8) Shader;
 pub extern fn LoadShaderFromMemory(vsCode: [*c]const u8, fsCode: [*c]const u8) Shader;
-pub extern fn GetShaderLocation(shader: Shader, uniformName: [*c]const u8) c_int;
-pub extern fn GetShaderLocationAttrib(shader: Shader, attribName: [*c]const u8) c_int;
-pub extern fn SetShaderValue(shader: Shader, locIndex: c_int, value: ?*const c_void, uniformType: c_int) void;
-pub extern fn SetShaderValueV(shader: Shader, locIndex: c_int, value: ?*const c_void, uniformType: c_int, count: c_int) void;
-pub extern fn SetShaderValueMatrix(shader: Shader, locIndex: c_int, mat: Matrix) void;
-pub extern fn SetShaderValueTexture(shader: Shader, locIndex: c_int, texture: Texture2D) void;
+pub extern fn GetShaderLocation(shader: Shader, uniformName: [*c]const u8) ShaderLocationIndex;
+pub extern fn GetShaderLocationAttrib(shader: Shader, attribName: [*c]const u8) ShaderLocationIndex;
+pub extern fn SetShaderValue(shader: Shader, locIndex: ShaderLocationIndex, value: ?*const c_void, uniformType: ShaderUniformDataType) void;
+pub extern fn SetShaderValueV(shader: Shader, locIndex: ShaderLocationIndex, value: ?*const c_void, uniformType: ShaderUniformDataType, count: c_int) void;
+pub extern fn SetShaderValueMatrix(shader: Shader, locIndex: ShaderLocationIndex, mat: Matrix) void;
+pub extern fn SetShaderValueTexture(shader: Shader, locIndex: ShaderLocationIndex, texture: Texture2D) void;
 pub extern fn UnloadShader(shader: Shader) void;
 pub extern fn GetMouseRay(mousePosition: Vector2, camera: Camera) Ray;
 pub extern fn GetCameraMatrix(camera: Camera) Matrix;
@@ -685,9 +691,9 @@ pub extern fn GetFrameTime() f32;
 pub extern fn GetTime() f64;
 pub extern fn GetRandomValue(min: c_int, max: c_int) c_int;
 pub extern fn TakeScreenshot(fileName: [*c]const u8) void;
-pub extern fn SetConfigFlags(flags: c_uint) void;
-pub extern fn TraceLog(logLevel: c_int, text: [*c]const u8, ...) void;
-pub extern fn SetTraceLogLevel(logLevel: c_int) void;
+pub extern fn SetConfigFlags(flags: ConfigFlags) void;
+pub extern fn TraceLog(logLevel: TraceLogLevel, text: [*c]const u8, ...) void;
+pub extern fn SetTraceLogLevel(logLevel: TraceLogLevel) void;
 pub extern fn MemAlloc(size: c_int) ?*c_void;
 pub extern fn MemRealloc(ptr: ?*c_void, size: c_int) ?*c_void;
 pub extern fn MemFree(ptr: ?*c_void) void;
@@ -723,28 +729,28 @@ pub extern fn DecompressData(compData: [*c]u8, compDataLength: c_int, dataLength
 pub extern fn SaveStorageValue(position: c_uint, value: c_int) bool;
 pub extern fn LoadStorageValue(position: c_uint) c_int;
 pub extern fn OpenURL(url: [*c]const u8) void;
-pub extern fn IsKeyPressed(key: c_int) bool;
-pub extern fn IsKeyDown(key: c_int) bool;
-pub extern fn IsKeyReleased(key: c_int) bool;
-pub extern fn IsKeyUp(key: c_int) bool;
-pub extern fn SetExitKey(key: c_int) void;
-pub extern fn GetKeyPressed() c_int;
-pub extern fn GetCharPressed() c_int;
+pub extern fn IsKeyPressed(key: KeyboardKey) bool;
+pub extern fn IsKeyDown(key: KeyboardKey) bool;
+pub extern fn IsKeyReleased(key: KeyboardKey) bool;
+pub extern fn IsKeyUp(key: KeyboardKey) bool;
+pub extern fn SetExitKey(key: KeyboardKey) void;
+pub extern fn GetKeyPressed() KeyboardKey;
+pub extern fn GetCharPressed() KeyboardKey;
 pub extern fn IsGamepadAvailable(gamepad: c_int) bool;
 pub extern fn IsGamepadName(gamepad: c_int, name: [*c]const u8) bool;
 pub extern fn GetGamepadName(gamepad: c_int) [*c]const u8;
-pub extern fn IsGamepadButtonPressed(gamepad: c_int, button: c_int) bool;
-pub extern fn IsGamepadButtonDown(gamepad: c_int, button: c_int) bool;
-pub extern fn IsGamepadButtonReleased(gamepad: c_int, button: c_int) bool;
-pub extern fn IsGamepadButtonUp(gamepad: c_int, button: c_int) bool;
-pub extern fn GetGamepadButtonPressed() c_int;
+pub extern fn IsGamepadButtonPressed(gamepad: c_int, button: GamepadButton) bool;
+pub extern fn IsGamepadButtonDown(gamepad: c_int, button: GamepadButton) bool;
+pub extern fn IsGamepadButtonReleased(gamepad: c_int, button: GamepadButton) bool;
+pub extern fn IsGamepadButtonUp(gamepad: c_int, button: GamepadButton) bool;
+pub extern fn GetGamepadButtonPressed() GamepadButton;
 pub extern fn GetGamepadAxisCount(gamepad: c_int) c_int;
-pub extern fn GetGamepadAxisMovement(gamepad: c_int, axis: c_int) f32;
+pub extern fn GetGamepadAxisMovement(gamepad: c_int, axis: GamepadAxis) f32;
 pub extern fn SetGamepadMappings(mappings: [*c]const u8) c_int;
-pub extern fn IsMouseButtonPressed(button: c_int) bool;
-pub extern fn IsMouseButtonDown(button: c_int) bool;
-pub extern fn IsMouseButtonReleased(button: c_int) bool;
-pub extern fn IsMouseButtonUp(button: c_int) bool;
+pub extern fn IsMouseButtonPressed(button: MouseButton) bool;
+pub extern fn IsMouseButtonDown(button: MouseButton) bool;
+pub extern fn IsMouseButtonReleased(button: MouseButton) bool;
+pub extern fn IsMouseButtonUp(button: MouseButton) bool;
 pub extern fn GetMouseX() c_int;
 pub extern fn GetMouseY() c_int;
 pub extern fn GetMousePosition() Vector2;
@@ -752,20 +758,20 @@ pub extern fn SetMousePosition(x: c_int, y: c_int) void;
 pub extern fn SetMouseOffset(offsetX: c_int, offsetY: c_int) void;
 pub extern fn SetMouseScale(scaleX: f32, scaleY: f32) void;
 pub extern fn GetMouseWheelMove() f32;
-pub extern fn SetMouseCursor(cursor: c_int) void;
+pub extern fn SetMouseCursor(cursor: MouseCursor) void;
 pub extern fn GetTouchX() c_int;
 pub extern fn GetTouchY() c_int;
 pub extern fn GetTouchPosition(index: c_int) Vector2;
-pub extern fn SetGesturesEnabled(flags: c_uint) void;
-pub extern fn IsGestureDetected(gesture: c_int) bool;
-pub extern fn GetGestureDetected() c_int;
+pub extern fn SetGesturesEnabled(flags: Gestures) void;
+pub extern fn IsGestureDetected(gesture: Gestures) bool;
+pub extern fn GetGestureDetected() Gestures;
 pub extern fn GetTouchPointsCount() c_int;
 pub extern fn GetGestureHoldDuration() f32;
 pub extern fn GetGestureDragVector() Vector2;
 pub extern fn GetGestureDragAngle() f32;
 pub extern fn GetGesturePinchVector() Vector2;
 pub extern fn GetGesturePinchAngle() f32;
-pub extern fn SetCameraMode(camera: Camera, mode: c_int) void;
+pub extern fn SetCameraMode(camera: Camera, mode: CameraMode) void;
 pub extern fn UpdateCamera(camera: [*c]Camera) void;
 pub extern fn SetCameraPanControl(keyPan: c_int) void;
 pub extern fn SetCameraAltControl(keyAlt: c_int) void;
@@ -816,7 +822,7 @@ pub extern fn CheckCollisionPointTriangle(point: Vector2, p1: Vector2, p2: Vecto
 pub extern fn CheckCollisionLines(startPos1: Vector2, endPos1: Vector2, startPos2: Vector2, endPos2: Vector2, collisionPoint: [*c]Vector2) bool;
 pub extern fn GetCollisionRec(rec1: Rectangle, rec2: Rectangle) Rectangle;
 pub extern fn LoadImage(fileName: [*c]const u8) Image;
-pub extern fn LoadImageRaw(fileName: [*c]const u8, width: c_int, height: c_int, format: c_int, headerSize: c_int) Image;
+pub extern fn LoadImageRaw(fileName: [*c]const u8, width: c_int, height: c_int, format: PixelFormat, headerSize: c_int) Image;
 pub extern fn LoadImageAnim(fileName: [*c]const u8, frames: [*c]c_int) Image;
 pub extern fn LoadImageFromMemory(fileType: [*c]const u8, fileData: [*c]const u8, dataSize: c_int) Image;
 pub extern fn UnloadImage(image: Image) void;
@@ -834,7 +840,7 @@ pub extern fn ImageCopy(image: Image) Image;
 pub extern fn ImageFromImage(image: Image, rec: Rectangle) Image;
 pub extern fn ImageText(text: [*c]const u8, fontSize: c_int, color: Color) Image;
 pub extern fn ImageTextEx(font: Font, text: [*c]const u8, fontSize: f32, spacing: f32, tint: Color) Image;
-pub extern fn ImageFormat(image: [*c]Image, newFormat: c_int) void;
+pub extern fn ImageFormat(image: [*c]Image, newFormat: PixelFormat) void;
 pub extern fn ImageToPOT(image: [*c]Image, fill: Color) void;
 pub extern fn ImageCrop(image: [*c]Image, crop: Rectangle) void;
 pub extern fn ImageAlphaCrop(image: [*c]Image, threshold: f32) void;
@@ -877,7 +883,7 @@ pub extern fn ImageDrawText(dst: [*c]Image, text: [*c]const u8, posX: c_int, pos
 pub extern fn ImageDrawTextEx(dst: [*c]Image, font: Font, text: [*c]const u8, position: Vector2, fontSize: f32, spacing: f32, tint: Color) void;
 pub extern fn LoadTexture(fileName: [*c]const u8) Texture2D;
 pub extern fn LoadTextureFromImage(image: Image) Texture2D;
-pub extern fn LoadTextureCubemap(image: Image, layout: c_int) TextureCubemap;
+pub extern fn LoadTextureCubemap(image: Image, layout: CubemapLayout) TextureCubemap;
 pub extern fn LoadRenderTexture(width: c_int, height: c_int) RenderTexture2D;
 pub extern fn UnloadTexture(texture: Texture2D) void;
 pub extern fn UnloadRenderTexture(target: RenderTexture2D) void;
@@ -886,8 +892,8 @@ pub extern fn UpdateTextureRec(texture: Texture2D, rec: Rectangle, pixels: ?*con
 pub extern fn GetTextureData(texture: Texture2D) Image;
 pub extern fn GetScreenData() Image;
 pub extern fn GenTextureMipmaps(texture: [*c]Texture2D) void;
-pub extern fn SetTextureFilter(texture: Texture2D, filter: c_int) void;
-pub extern fn SetTextureWrap(texture: Texture2D, wrap: c_int) void;
+pub extern fn SetTextureFilter(texture: Texture2D, filter: TextureFilter) void;
+pub extern fn SetTextureWrap(texture: Texture2D, wrap: TextureWrap) void;
 pub extern fn DrawTexture(texture: Texture2D, posX: c_int, posY: c_int, tint: Color) void;
 pub extern fn DrawTextureV(texture: Texture2D, position: Vector2, tint: Color) void;
 pub extern fn DrawTextureEx(texture: Texture2D, position: Vector2, rotation: f32, scale: f32, tint: Color) void;
@@ -906,15 +912,15 @@ pub extern fn ColorFromHSV(hue: f32, saturation: f32, value: f32) Color;
 pub extern fn ColorAlpha(color: Color, alpha: f32) Color;
 pub extern fn ColorAlphaBlend(dst: Color, src: Color, tint: Color) Color;
 pub extern fn GetColor(hexValue: c_int) Color;
-pub extern fn GetPixelColor(srcPtr: ?*c_void, format: c_int) Color;
-pub extern fn SetPixelColor(dstPtr: ?*c_void, color: Color, format: c_int) void;
-pub extern fn GetPixelDataSize(width: c_int, height: c_int, format: c_int) c_int;
+pub extern fn GetPixelColor(srcPtr: ?*c_void, format: PixelFormat) Color;
+pub extern fn SetPixelColor(dstPtr: ?*c_void, color: Color, format: PixelFormat) void;
+pub extern fn GetPixelDataSize(width: c_int, height: c_int, format: PixelFormat) c_int;
 pub extern fn GetFontDefault() Font;
 pub extern fn LoadFont(fileName: [*c]const u8) Font;
 pub extern fn LoadFontEx(fileName: [*c]const u8, fontSize: c_int, fontChars: [*c]c_int, charsCount: c_int) Font;
 pub extern fn LoadFontFromImage(image: Image, key: Color, firstChar: c_int) Font;
 pub extern fn LoadFontFromMemory(fileType: [*c]const u8, fileData: [*c]const u8, dataSize: c_int, fontSize: c_int, fontChars: [*c]c_int, charsCount: c_int) Font;
-pub extern fn LoadFontData(fileData: [*c]const u8, dataSize: c_int, fontSize: c_int, fontChars: [*c]c_int, charsCount: c_int, type: c_int) [*c]CharInfo;
+pub extern fn LoadFontData(fileData: [*c]const u8, dataSize: c_int, fontSize: c_int, fontChars: [*c]c_int, charsCount: c_int, type: FontType) [*c]CharInfo;
 pub extern fn GenImageFontAtlas(chars: [*c]const CharInfo, recs: [*c][*c]Rectangle, charsCount: c_int, fontSize: c_int, padding: c_int, packMethod: c_int) Image;
 pub extern fn UnloadFontData(chars: [*c]CharInfo, charsCount: c_int) void;
 pub extern fn UnloadFont(font: Font) void;
@@ -978,7 +984,7 @@ pub extern fn ExportMesh(mesh: Mesh, fileName: [*c]const u8) bool;
 pub extern fn LoadMaterials(fileName: [*c]const u8, materialCount: [*c]c_int) [*c]Material;
 pub extern fn LoadMaterialDefault() Material;
 pub extern fn UnloadMaterial(material: Material) void;
-pub extern fn SetMaterialTexture(material: [*c]Material, mapType: c_int, texture: Texture2D) void;
+pub extern fn SetMaterialTexture(material: [*c]Material, mapType: MaterialMapIndex, texture: Texture2D) void;
 pub extern fn SetModelMeshMaterial(model: [*c]Model, meshId: c_int, materialId: c_int) void;
 pub extern fn LoadModelAnimations(fileName: [*c]const u8, animsCount: [*c]c_int) [*c]ModelAnimation;
 pub extern fn UpdateModelAnimation(model: Model, anim: ModelAnimation, frame: c_int) void;
